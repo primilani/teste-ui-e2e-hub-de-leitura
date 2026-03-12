@@ -1,3 +1,7 @@
+/// <reference types="cypress"/>
+import { faker, Faker } from "@faker-js/faker";
+import cadastroPage from "../support/pages/cadastro-page";
+
 describe('Testes End To End do fluxo de cadastro e login', () => {
 
     /* 
@@ -18,11 +22,31 @@ describe('Testes End To End do fluxo de cadastro e login', () => {
     */
 
     beforeEach(() => {
-        // Configurações iniciais, se necessário
+        cadastroPage.visitarPaginaCadastro()
     });
 
-
     it('Deve fazer o cadastro e validar o login com o usuário cadastrado', () => {
-        // Criar todo o fluxo aqui dentro deste único "it"
+        // Criando um novo usuário
+        let nome = faker.person.fullName()
+        let email = faker.internet.email()
+        cy.get('#name').type(nome)
+        cy.get('#email').type(email)
+        cy.get('#phone').type('51999990067')
+        cy.get('#password').type('Senha@123')
+        cy.get('#confirm-password').type('Senha@123')
+        cy.get('#terms-agreement').check() // Tambem da certo com 'Click'
+        cy.get('#register-btn').click()
+        // Rsultado esperado
+        cy.url().should('include', 'dashboard')
+        cy.get('#user-name').should('contain', nome)
+
+        //Acessar pagina de login
+        cy.get('.btn-outline-danger > .fas').click()
+
+        //Preencher fomulario de login = email: Jordyn.Roob@gmail.com / senha: Senha@123
+        cy.get('#email').type('Jordyn.Roob@gmail.com')
+        cy.get('#password').type('Senha@123')
+        cy.get('#login-btn').click()
+        cy.get('#user-name').should('contain', 'Roberta Wilderman')
     });
 });
